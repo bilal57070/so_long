@@ -6,7 +6,7 @@
 /*   By: bsafi <bsafi@student.42nice.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/06 15:29:40 by bsafi             #+#    #+#             */
-/*   Updated: 2023/06/19 15:40:38 by bsafi            ###   ########.fr       */
+/*   Updated: 2023/07/04 17:33:09 by bsafi            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,6 +39,8 @@ int	checkav(char **av)
 	int	fd;
 
 	i = ft_strlen(av[1]) - 1;
+	if (open(av[1], O_DIRECTORY) != -1)
+		error();
 	fd = open(av[1], O_RDONLY);
 	/*while(av[1] && fd != 0)
 	{

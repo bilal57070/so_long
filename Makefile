@@ -6,7 +6,7 @@
 #    By: bsafi <bsafi@student.42nice.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/06/01 14:49:58 by bsafi             #+#    #+#              #
-#    Updated: 2023/06/22 02:41:43 by bsafi            ###   ########.fr        #
+#    Updated: 2023/07/04 19:59:21 by bsafi            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,6 +32,8 @@ ${NAME}: ${OBJS}
 clean:
 	@${MAKE} clean -C ${LIBFT}/
 	@${RM} ${OBJS}
+
+bonus: all
 
 fclean: clean
 	@${RM} ${NAME} ${LIBFT}/libft.a

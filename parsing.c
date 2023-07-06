@@ -6,7 +6,7 @@
 /*   By: bsafi <bsafi@student.42nice.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/01 15:17:57 by bsafi             #+#    #+#             */
-/*   Updated: 2023/06/17 20:20:48 by bsafi            ###   ########.fr       */
+/*   Updated: 2023/07/04 17:18:23 by bsafi            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ void	cpymap(char *av, t_map *map)
 		i++;
 	}
 	map->mapi[i] = 0;
+	countc(map);
 	checkerror(map);
 	i = 0;
 	//while (map->mapi[i])
@@ -53,4 +54,23 @@ void	countmap(char *av, t_map *map)
 	close(fd);
 	ft_printf("line = %d\n", map->num);
 	ft_printf("col = %d\n", map->numline);
+}
+
+void	countc(t_map *map)
+{
+	int	i;
+	int	j;
+	
+	i = -1;
+	map->c = 0;
+	while (map->mapi[++i])
+	{
+		j = -1;
+		while (map->mapi[i][++j])
+		{
+			if (map->mapi[i][j] == 'C')
+				map->c++;	
+		}
+	}
+	ft_printf("%d", map->c);
 }

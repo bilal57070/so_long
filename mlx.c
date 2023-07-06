@@ -6,7 +6,7 @@
 /*   By: bsafi <bsafi@student.42nice.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/16 18:23:06 by bsafi             #+#    #+#             */
-/*   Updated: 2023/06/22 23:29:45 by bsafi            ###   ########.fr       */
+/*   Updated: 2023/07/05 19:40:42 by bsafi            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,8 +89,6 @@ int		test(t_map *map)
 	int	i;
 	int	j;
 
-	//map->mlx = mlx_init();
-	//map->win = mlx_new_window(map->mlx, (map->num - 1) * 64, map->numline * 64, "Hello bekhey");
 	getimg(map);
 	i = -1;
 	while (map->mapi[++i])
@@ -99,12 +97,8 @@ int		test(t_map *map)
 			while(map->mapi[i][++j])
 			{
 				check(map, i, j);
-				//printf("\npipi");
 			}
 		}
-	//mlx_hook(map->mlx, 2, 1L<<0, key_hook, map);
-	//mlx_loop(map->mlx);
-	//mlx_hook(map->mlx, 2, 1L<<0, handle_key, map);
 	return (0);
 }
 
@@ -119,6 +113,12 @@ int		check(t_map *map, int i, int j)
 {
 	if(map->mapi[i][j] == '0' || map->mapi[i][j] == 'P')
 		putimg(map, map->grass, j * 64, i * 64);
+	if(map->mapi[i][j] == 'R')
+	{
+		putimg(map, map->grass, j * 64, i * 64);
+		putimg(map, map->exit, j * 64, i * 64);
+		putimg(map, map->img1, j * 64, i * 64);
+	}
 	if(map->mapi[i][j] == 'P')
 		putimg(map, map->img1, j * 64, i * 64);
 	if(map->mapi[i][j] == '1')
@@ -133,6 +133,11 @@ int		check(t_map *map, int i, int j)
 
 int key_hook(int keycode, t_map *map)
 {
+	int	i;
+	int	j;
+
+	i = 0;
+	j = 0;
     if (keycode == 53)
     {
 		mlx_destroy_window(map->mlx, map->win);
@@ -140,21 +145,18 @@ int key_hook(int keycode, t_map *map)
 		exit(EXIT_SUCCESS);
     }
 	if (keycode == 2)
-		right(map);
+		right(map, i, j);
 	if (keycode == 0)
 		left(map);
 	if (keycode == 1)
-		down(map);
+		down(map, i, j);
 	if (keycode == 13)
 		up(map);
     return (0);
 }
 
-int		right(t_map *map)
+int	right(t_map *map, int i, int j)
 {
-	int	i;
-	int	j;
-
 	i = -1;
 	ft_printf("mouv = %d\n", map->count++);
 	while(map->mapi[++i])
@@ -162,12 +164,17 @@ int		right(t_map *map)
 		j = -1;
 		while(map->mapi[i][++j])
 		{
-			if (map->mapi[i][j] == 'P' && map->mapi[i][j + 1] == 'E')
+			if (map->mapi[i][j] == 'P' && map->mapi[i][j + 1] == 'E' && map->c == 0)
 				ft_exit();
-			if (map->mapi[i][j] == 'P' && map->mapi[i][j + 1] != '1')
+			if (map->mapi[i][j] == 'P' && map->mapi[i][j + 1] != '1' && map->mapi[i][j + 1] != 'E')
 			{
-				map->mapi[i][j] = '0';
-				map->mapi[i][j + 1] = 'P';
+				enfin(map, i, j);
+				return (0);
+			}
+			if ((map->mapi[i][j] == 'P' && map->mapi[i][j + 1] == 'E' && map->c != 0) || 
+			(map->mapi[i][j] == 'R' && map->mapi[i][j + 1] != '1'))
+			{
+				enfin(map, i, j);
 				return (0);
 			}
 		}
@@ -175,7 +182,31 @@ int		right(t_map *map)
 	return (0);
 }
 
-int		left(t_map *map)
+void	enfin(t_map *map, int i, int j)
+{
+	if (map->mapi[i][j + 1] == 'C')
+		map->c--;
+	if (map->mapi[i][j] == 'P' && map->mapi[i][j + 1] != '1' && map->mapi[i][j + 1] != 'E')
+	{
+		map->mapi[i][j] = '0';
+		map->mapi[i][j + 1] = 'P';
+	}
+	if (map->mapi[i][j] == 'P' && map->mapi[i][j + 1] == 'E' && map->c != 0)
+	{
+		map->mapi[i][j + 1] = 'R';
+		map->mapi[i][j] = '0';
+		//return (0);
+	}
+				//ex(map, i, j);
+	if (map->mapi[i][j] == 'R' && map->mapi[i][j + 1] != '1')
+	{
+		map->mapi[i][j] = 'E';
+		map->mapi[i][j + 1] = 'P';
+//		return (0);
+	}
+}
+
+void	left(t_map *map)
 {
 	int	i;
 	int	j;
@@ -187,20 +218,24 @@ int		left(t_map *map)
 		j = -1;
 		while(map->mapi[i][++j])
 		{
-			if (map->mapi[i][j] == 'P' && map->mapi[i][j - 1] == 'E')
+			if (map->mapi[i][j] == 'P' && map->mapi[i][j - 1] == 'E' && map->c == 0)
 				ft_exit();
-			if (map->mapi[i][j] == 'P' && map->mapi[i][j - 1] != '1')
+			if (map->mapi[i][j] == 'P' && map->mapi[i][j - 1] != '1' && map->mapi[i][j - 1] != 'E')
 			{
+				if (map->mapi[i][j - 1] == 'C')
+					map->c--;
 				map->mapi[i][j] = '0';
 				map->mapi[i][j - 1] = 'P';
-				return (0);
 			}
+			if (map->mapi[i][j] == 'P' && map->mapi[i][j - 1] == 'E')
+				ex(map, i, j);
+			if (map->mapi[i][j] == 'R' && map->mapi[i][j - 1] != '1')
+				bug(map, i, j);
 		}
 	}
-	return (0);
 }
 
-int		up(t_map *map)
+void	up(t_map *map)
 {
 	int	i;
 	int	j;
@@ -212,64 +247,153 @@ int		up(t_map *map)
 		j = -1;
 		while(map->mapi[i][++j])
 		{
-			if (map->mapi[i][j] == 'P' && map->mapi[i - 1][j] == 'E')
+			if (map->mapi[i][j] == 'P' && map->mapi[i - 1][j] == 'E' && map->c == 0)
 				ft_exit();
-			if (map->mapi[i][j] == 'P' && map->mapi[i - 1][j] != '1')
+			if (map->mapi[i][j] == 'P' && map->mapi[i - 1][j] != '1' && map->mapi[i - 1][j] != 'E')
 			{
+				if (map->mapi[i - 1][j] == 'C')
+					map->c--;
 				map->mapi[i][j] = '0';
 				map->mapi[i - 1][j] = 'P';
-				return (0);
 			}
+			if (map->mapi[i][j] == 'P' && map->mapi[i - 1][j] == 'E')
+				ex(map, i, j);
+			if (map->mapi[i][j] == 'R' && map->mapi[i - 1][j] != '1')
+				haut(map, i, j);
 		}
 	}
-	return (0);
 }
 
-int		down(t_map *map)
+int		down(t_map *map, int i, int j)
 {
-	int	i;
-	int	j;
-
 	i = -1;
-	ft_printf("mouv = %d\n", map->count++);
+	//ft_printf("mouv = %d\n", map->count++);
 	while(map->mapi[++i])
 	{
 		j = -1;
 		while(map->mapi[i][++j])
 		{
-			if (map->mapi[i][j] == 'P' && map->mapi[i + 1][j] == 'E')
+			if (map->mapi[i][j] == 'P' && map->mapi[i + 1][j] == 'E' && map->c == 0)
 				ft_exit();
-			if (map->mapi[i][j] == 'P' && map->mapi[i + 1][j] != '1')
+			if (map->mapi[i][j] == 'P' && map->mapi[i + 1][j] != '1' && map->mapi[i + 1][j] != 'E')
 			{
-				map->mapi[i][j] = '0';
-				map->mapi[i + 1][j] = 'P';
+				fini(map, i, j);
 				return (0);
 			}
+			/*{
+				if (map->mapi[i + 1][j] == 'C')
+					map->c--;
+				map->mapi[i][j] = '0';
+				map->mapi[i + 1][j] = 'P';
+				//return (0);
+			}*/
+			if ((map->mapi[i][j] == 'P' && map->mapi[i + 1][j] == 'E') ||
+			 (map->mapi[i][j] == 'R' && map->mapi[i + 1][j] != '1'))
+			 {
+				fini(map, i, j);
+				return (0);
+			 }
 		}
 	}
 	return (0);
 }
-/*int	toz(t_map *map)
+
+void	fini(t_map *map, int i, int j)
 {
-	(void) map;
+	if (map->mapi[i + 1][j] == 'C')
+		map->c--;
+	if (map->mapi[i][j] == 'P' && map->mapi[i + 1][j] != '1' && map->mapi[i + 1][j] != 'E')
+	{
+		map->mapi[i][j] = '0';
+		map->mapi[i + 1][j] = 'P';
+	}
+	if (map->mapi[i][j] == 'P' && map->mapi[i + 1][j] == 'E' && map->c != 0)
+	{
+		map->mapi[i + 1][j] = 'R';
+		map->mapi[i][j] = '0';
+		//return (0);
+	}
+				//ex(map, i, j);
+	if (map->mapi[i][j] == 'R' && map->mapi[i + 1][j] != '1')
+	{
+		map->mapi[i][j] = 'E';
+		map->mapi[i + 1][j] = 'P';
+//		return (0);
+	}
+}
+
+int		ex(t_map *map, int i , int j)
+{
+	if (map->mapi[i][j] == 'P' && map->mapi[i + 1][j] == 'E')
+	{
+		map->mapi[i + 1][j] = 'R';
+		map->mapi[i][j] = '0';
+		return (0);
+	}
+	if (map->mapi[i][j] == 'P' && map->mapi[i - 1][j] == 'E')
+	{
+		map->mapi[i - 1][j] = 'R';
+		map->mapi[i][j] = '0';
+		return (0);
+	}
+	if (map->mapi[i][j] == 'P' && map->mapi[i][j + 1] == 'E')
+	{
+		map->mapi[i][j + 1] = 'R';
+		map->mapi[i][j] = '0';
+		return (0);
+	}
+	if (map->mapi[i][j] == 'P' && map->mapi[i][j - 1] == 'E')
+	{
+		map->mapi[i][j - 1] = 'R';
+		map->mapi[i][j] = '0';
+		return (0);
+	}
 	return (0);
-}*/
+}
 
-/*void	mouv(t_map *map)
+void	bug(t_map *map, int	i, int j)
 {
-	int	i;
-	int	j;
+	if (map->mapi[i][j - 1] == 'C')
+		map->c--;
+	if (map->mapi[i][j] == 'R' && map->mapi[i][j - 1] != '1')
+	{
+		map->mapi[i][j] = 'E';
+		map->mapi[i][j - 1] = 'P';
+	}
+}
 
-	i = -1;
-	while (map->mapi[++i])
-		{
-			j = -1;
-			while(map->mapi[i][++j])
-			{
-				check(map, i, j);
-			}
-		}
-}*/
+void	droi(t_map *map, int i, int j)
+{
+	if (map->mapi[i][j + 1] == 'C')
+		map->c--;
+	if (map->mapi[i][j] == 'R' && map->mapi[i][j + 1] != '1')
+	{
+		map->mapi[i][j] = 'E';
+		map->mapi[i][j + 1] = 'P';
+	}
+}
+
+void	bas(t_map *map, int	i, int j)
+{
+	if (map->mapi[i + 1][j] == 'C')
+		map->c--;
+	if (map->mapi[i][j] == 'R' && map->mapi[i + 1][j] != '1')
+	{
+		map->mapi[i][j] = 'E';
+		map->mapi[i + 1][j] = 'P';
+	}
+}
+
+void	haut(t_map *map, int i, int j)
+{
+	if (map->mapi[i - 1][j] == 'C')
+		map->c--;
+	if (map->mapi[i][j] == 'R' && map->mapi[i - 1][j] != '1')
+	{
+		map->mapi[i][j] = 'E';
+		map->mapi[i - 1][j] = 'P';
+	}
+}
 
 int		ft_exit(void)
 {

@@ -6,7 +6,7 @@
 /*   By: bsafi <bsafi@student.42nice.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/01 14:53:42 by bsafi             #+#    #+#             */
-/*   Updated: 2023/06/22 22:52:25 by bsafi            ###   ########.fr       */
+/*   Updated: 2023/07/05 16:29:54 by bsafi            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ typedef struct s_map
 	int		numline;
 	int		num;
 	void	*nwin;
+	int		c;
 	
 	void	*mlx;
 	void	*img1;
@@ -66,13 +67,21 @@ void	getimg(t_map *map);
 int		test(t_map *map);
 void	putimg(t_map *map, void *img, int x, int y);
 int		check(t_map *map, int i, int j);
-int		right(t_map *map);
-int		left(t_map *map);
-int		up(t_map *map);
-int		down(t_map *map);
+int		right(t_map *map, int i, int j);
+void	left(t_map *map);
+void	up(t_map *map);
+int		down(t_map *map, int i, int j);
 int 	key_hook(int keycode, t_map *map);
 //int		toz(t_map *map);
 void	mouv(t_map *map);
 int		ft_exit(void);
+void	countc(t_map *map);
+int		ex(t_map *map, int i , int j);
+void	bug(t_map *map, int	i, int j);
+void	droi(t_map *map, int i, int j);
+void	haut(t_map *map, int i, int j);
+void	bas(t_map *map, int i, int j);
+void	enfin(t_map *map, int i, int j);
+void	fini(t_map *map, int i, int j);
 
 #endif
